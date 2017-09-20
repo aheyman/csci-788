@@ -1,3 +1,4 @@
+import csv
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 import requests
@@ -5,6 +6,7 @@ from fake_useragent import UserAgent
 import time
 from random import randint
 import traceback
+import math
 
 ### DB connections
 client = MongoClient()
@@ -73,7 +75,7 @@ def parse_html(content, cmpy: Company) -> []:
 
 '''
 Flex-grid contains between 0-3 elements
-This method safely determines which is not null and retuns the span value
+This method safely determines which is not null and returns the span value
 '''
 def parse_categories(review):
 
@@ -117,21 +119,22 @@ def safe_dictionary_lookup(review, attrib, clazz, key):
 
 companies = []
 
-# with open('companies.csv') as f:
-#     companyline = f.read().split(',')
-#     companies.append(Company(companyline[0], companyline[1], int(companyline[2])))
+with open('companies.csv') as csvfile:
+    companyreader = csv.reader(csvfile, delimiter=',')
+    for row in companyreader:
+        companies.append(Company(row[0], row[1], int(row[2])))
 
-companies.append(Company('Apple','E1138',11000))
+print(str(companies))
 
 for company in companies:
 
     # Only get 1000 reviews
-    max_reviews = 1000 if company.reviews > 1000 else company.reviews
+    max_requests = 100 if company.reviews > 1000 else math.ceil(company.reviews // 10)
 
     mongo_reviews = []
 
     try:
-        for idx in range(1,max_reviews):
+        for idx in range(1, max_requests+1):
             html_content = query_website(company, idx)
 
             mongo_reviews.extend(parse_html(html_content,company))
@@ -140,7 +143,7 @@ for company in companies:
             if (len(mongo_reviews) > 149):
                 glassdoor_reviews.insert_many(mongo_reviews)
                 mongo_reviews = []
-            wait = randint(30, 90)
+            wait = randint(15, 60)
             print("waiting " + str(wait) + " seconds")
             time.sleep(wait)
 
