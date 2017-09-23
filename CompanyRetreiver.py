@@ -33,10 +33,27 @@ def parse_html(content) -> []:
 
     company = soup.find('div', class_='eiHdrModule module snug ')
 
-    url = company.find('a', class_='eiCell cell reviews')['href']
-    reviews = company.find('span', class_='num h2').getText()
+    url = safe_dictionary_lookup(company, 'a', 'eiCell cell reviews', 'href')
+    reviews = safe_text_find(company, 'span', 'num h2')
 
     return url, reviews
+
+'''
+Returns none if the node does not exist
+'''
+def safe_text_find(review, attrib, clazz):
+    return None if not review.find(attrib, class_=clazz) else review.find(attrib, class_=clazz).getText()
+
+'''
+Returns None if the key-value pair does not exist
+'''
+def safe_dictionary_lookup(review, attrib, clazz, key):
+    review_dict = review.find(attrib, class_=clazz)
+    if review_dict:
+        if key in review_dict.attrs:
+            return review_dict[key]
+    return None
+
 
 
 #########################################################
@@ -65,10 +82,7 @@ for company in companies:
         result = [company, url, reviews]
         results.append(result)
 
-        if len(result) > 0:
-            break
-
-        wait = randint(120, 300)
+        wait = randint(120, 240)
         print("waiting " + str(wait) + " seconds")
         time.sleep(wait)
 
@@ -79,9 +93,8 @@ for company in companies:
         print(traceback.format_exc())
 
     finally:
-        with open('results.csv', 'w') as f:
+        with open('results.csv', 'a') as f:
             writer = csv.writer(f)
-            writer.writerow(['company', 'url', 'reviews'])
             for item in results:
                 writer.writerow([item[0], item[1], item[2]])
 
