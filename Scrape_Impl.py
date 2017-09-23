@@ -19,13 +19,10 @@ header = {'User-Agent': str(ua.chrome)}
 
 class Company:
 
-    def __init__(self, company_name: str, employer_number: str, total_reviews: int) -> None:
+    def __init__(self, company_name: str, url: str, total_reviews: int) -> None:
         self.cn = company_name
-        self.en = employer_number
+        self.url = url.split(".")[0]
         self.reviews = total_reviews
-
-    def __str__(self) -> str:
-        return self.cn.replace(' ', '-') + '-Reviews-' + self.en
 
 
 '''
@@ -33,7 +30,7 @@ Queries the base URL
 '''
 def query_website(cmpy : Company, page_num: int):
 
-    url = 'https://www.glassdoor.com/Reviews/' + str(cmpy) + '_P' + str(page_num) + '.htm'
+    url = 'https://www.glassdoor.com' + cmpy.url + '_P' + str(page_num) + '.htm'
     print("Querying: " + url)
     result = requests.get(url, headers=header)
 
