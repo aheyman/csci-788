@@ -29,12 +29,35 @@ def query_website(company_name):
 Converts HTML to list of python dictionaries
 '''
 def parse_html(content) -> []:
+
+    max = -1
+    url = ''
+    reviews = ''
+
     soup = BeautifulSoup(content, 'lxml')
 
-    company = soup.find('div', class_='eiHdrModule module snug ')
+    # Glassdoor auto redirects to the exact page
+    if ('working' in soup.title.string.lower() or 'career' in soup.title.string.lower()):
+        data = soup.find('a', class_='eiCell cell reviews ')
+        url = data['href']
+        reviews = data.find('span', class_='num h2').getText()
 
-    url = safe_dictionary_lookup(company, 'a', 'eiCell cell reviews', 'href')
-    reviews = safe_text_find(company, 'span', 'num h2')
+    else:  # search page
+        companyList = soup.findAll('div', class_='eiHdrModule module snug ')
+
+        # For each on the first page, find the one with the most reviews
+        for company in companyList:
+            temp_url = safe_dictionary_lookup(company, 'a', 'eiCell cell reviews', 'href')
+            temp_reviews = safe_text_find(company, 'span', 'num h2')
+
+            # if it has a k, convert it to an int
+            if 'k' in temp_reviews:
+                temp_reviews = str(float(temp_reviews[:-1]) * 1000)
+
+            if (int(temp_reviews) > max):
+                max = int(temp_reviews)
+                url = temp_url
+                reviews = temp_reviews
 
     return url, reviews
 

@@ -116,12 +116,13 @@ def safe_dictionary_lookup(review, attrib, clazz, key):
 
 companies = []
 
-with open('companies.csv') as csvfile:
+with open('results_complete.csv') as csvfile:
     companyreader = csv.reader(csvfile, delimiter=',')
     for row in companyreader:
         companies.append(Company(row[0], row[1], int(row[2])))
+        if len(companies) > 100:
+            break
 
-print(str(companies))
 
 for company in companies:
 
