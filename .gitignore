@@ -1,13 +1,8 @@
 # Latex files
-writeup/*.aux
-writeup/*.bbl
-writeup/*.blg
-writeup/*.log
-writeup/*.bst
-writeup/*.cls
-writeup/*.pdf
-writeup/Makefile
-
+writeup/*
+!writeup/*.bib
+!writeup/*.tex
+!writeup/img/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
