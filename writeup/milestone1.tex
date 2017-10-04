@@ -164,7 +164,7 @@
 
 % *** MATH PACKAGES ***
 %
-%\usepackage[cmex10]{amsmath}
+\usepackage[cmex10]{amsmath}
 % A popular package from the American Mathematical Society that provides
 % many useful and powerful commands for dealing with mathematics. If using
 % it, be sure to load this package with the cmex10 option to ensure that
@@ -440,21 +440,49 @@ These user generated reviews can provide an insight into how average employees v
 
 As these reviews are formatted in short-text responses, I will apply data analysis, natural language processing, and sentiment analysis techniques to act as an informal company survey of satisfaction.
 
+Much of the current NLP, data analysis, and sentiment research demonstrates success with different sources of social media data (Twitter tweets, Facebook posts, etc), but has not been limited to Glassdoor content.
+This research will strengthen the body of work that NLP techniques can be used on real-world content.
+Further, it also adds to the body of research within Business Management regarding employee sentiment.  
+In addition to employee feedback, these reviews contain information like job title, company outlook, CEO evaluation which provide additional dimensionality for investigation.
+
+
 \section{Literature Review}
+Currently, there are two paper that performs similar research.
 
-To correctly evaluate the current research landscape, we must obtain literature focusing on: employee sentiment and company performance, detecting sentiment from user-submitted data, and Glassdoor as a data source.
+The first paper, `Sentiment Analysis and the Impact of Employee Satisfaction on Firm Earnings',\cite{Moniz2014}, the authors collected 41,227 reviews from Glassdoor for public companies. 
+Using Latent Dirichlet Allocation (LDA), they constructed company documents, determined sentiment using the General Inquirer dictionary, and found that companies that had negative sentiment experienced a statistically significant increase in the number of negative surprise earnings.  
+Overall, this means that the company under-performed expectations more often when the firm outlook was negative via the reviews.
 
+In Employee Statisfaction and Corporate Performance: Mining Employee Reviews on Glassdoor.com \cite{luo2016employee}, the authors obtained 257,454 reviews from the Fortune 500 firms, categorize the text based into nine categories of corporate value, perform data cleaning/frequency and then sentiment analysis.
+For their dependent variable, they used Tobin's Q 
+\[
+Tobin's\ Q\ = \frac{Total\ market\ value}{Total\ asset\ value}
+\]
+as it incorporates the company intangibles the market has internalized vs the book value of the company.
+Finally, they use OLS regression to predict how each categories of corporate value in reviews impact the overall Tobin's Q.
 
-In \cite{luo2016employee} 
+The OLS models that were constructed provide some measure of success; however, there are additional areas of study.
+The OLS regression may be to specific for this type of data.  
+Overall, the $R\sup{2}$ value was $<.2$ and some of the variables were statistically significant.  
+Rather than regressing across a continuous dataset, it may be beneficial to perform some binary/multi-class classification (outperform/neutral/underperform), or use a decision tree construct to demonstrate some potential attributes that generate information.
+Further, the Tobin's Q metric as a dependent variable choice assumes that the market has internalized employee satisfaction at the company and priced it in accordingly.
 
-In \cite{Moniz2014} obtained 41,227 reviews
+The remaining salient literature can be categorized as: Relationship between sentiment and performance, and finally, detecting sentiment from user created data.
 
-%
-%Much of the current NLP, data analysis, and sentiment research demonstrates success with different sources of social media data (Twitter tweets, Facebook posts, etc), but has not been limited to Glassdoor content.
-%This research will strengthen the body of work that NLP techniques can be used on real-world content.
-%Further, it also adds to the body of research within Business Management regarding employee sentiment.  
-%In addition to employee feedback, these reviews contain information like job title, company outlook, CEO evaluation which provide additional dimensionality for investigation.
+In addition to the previously completed research, there are many books and jouranl articles\cite{pang2008opinion}\cite{aggarwal2012mining}\cite{miner2012practical} that demonstrate the success of determining sentiment from semi-structured and unstructured text data.
 
+\subsection{Glassdoor as a data source}
+One other paper used Glassdoor as a data source\cite{huang2015family}, and found that corporate culture in family firms can be used to predict Tobin's Q and return on assets.
+
+\subsection{Employee Sentiment and Performance}
+There is not a single conclusion regarding employees and firm performance. 
+In a paper within the Journal of Corporate Finance, the author was able to demonstrate how companies included in the `100 Best Companies to Work For in America' achieved superior, risk adjusted return.\cite{edmans}
+In `The Value of Corporate Culture',\cite{guiso2015value} the authors were able to use the full survey data from the aforementioned list, including the companies that did not make it into the top 100.
+After devising a strategy to cluster similar words into a semantic framework, they were able to demonstrate how an increase in managers integrity shows an improvement to the Tobin's Q.
+This paper; however, did not find a relationship for other company attributes like `Innovation', `Respect' and `Quality'.\\
+
+Researchers\cite{schneider2003comes} were also able to show a relationship between job satisfaction, security and pay had a positive/reciprocal relationship with return on assets and earnings per share.
+Finally, in `Capital, Labor and the Firm: A Study of German Codetermination'\cite{gorton2004capital}, it was shown that companies with more employee involvement in the corporate decision making process trade at a substantial discount when compared to similar companies with less employee involvement.
 
 \section{Scrape and Architecture}
 To obtain and store the reviews, I built two scraping applications around the BeautifulSoup python web framework.
@@ -535,14 +563,52 @@ Mongoexport returns all of the documents as a single json file, and mongodump is
 I have a semi-weekly job that runs both of these backup processes, and then I manually ensure the DB can be restored using these files on a separate system. 
 Further, this data is stored on the RIT Google Drive instance for additional safety.
 
-\subsection{MetaData}
+\subsection{Metadata}
 Bloomberg, a financial market data service available in the RIT Saunders School of Business will be the primary source of company meta data including industry, average number of employees, years in business, etc.
 Bloomberg provides an API library to easily query and store data.
 As the data collection winds down, these reviews will be enhanced with company metadata from the Bloomberg Professional Service.
 
 	
 \section{Quantitative Measures for Company Success}
-I have narrowed this down into two sections: equity prices and 
+For a company to be `successful', it can mean various things.
+For public companies, typically success is demonstrated by consistent, sustainable profits.
+These can be paid out to shareholders through dividends or reinvested into the company for future growth and operation.
+The more successful a company is, the more investors demand their stock and the higher the price rises.
+
+Beyond stock price, there are a litany of financial metrics used to judge how effective a company is including: Return-on-Equity, Return-on-Assets, Cash flow from Operations, Inventory Turnover, etc. 
+All of these have their own positive and negatives associated.
+Some are only relevant in specific industries (technology companies rarely have inventory) while others can be subject to accounting manipulation or are obscured by some additional value (debt). 
+
+The Luo paper\cite{luo2016employee} used Tobin's Q as a measure of company success.
+The authors chose `Tobin's Q' because it demonstrates the market's view on intangible factors.
+A higher value indicates that the market believes this company has certain qualities that can not be explicitly valued by the current assets they own.
+
+While Tobin's Q may be a good proxy, the paper `Does the stock market fully value intangibles? Employee satisfaction and equity prices'\cite{edmans}, the author finds that choosing a portfolio of the `100 Best Companies to Work For in America' outperforms the market on a risk-adjusted basis.  
+Essentially, if you were to choose a portfolio of these stocks once the list was announced, you would consistently outperform the market by approximately 3.5\% per year.
+This highlights how publicly available information about company intangibles may not be captured by the market until after the financial performance is explicitly demonstrated, through quarterly financial results.
+
+This ultimately leads to 3 possible scenarios:
+\begin{enumerate}
+%
+\item The market is aware of these intangibles and they impact the value of the stock price.
+\begin{itemize}
+\item Most financial metrics can be used and there should be a relationship between sentiment and most metrics.
+\end{itemize}
+%
+\item The market is \textbf{not} aware of these intangibles and they impact the value of the stock price
+\begin{itemize}
+\item Financial performance metrics like ROE, ROA, and Tobin's Q will be inaccurate.
+\item Future stock price changes, controlling for external factors, should be correlated to changes in sentiment.
+\end{itemize}
+%
+\item The market may or may not be aware of these intangibles; however, they \textbf{do not} impact the value of the stock price
+\begin{itemize}
+\item This scenario will lead to spurious results
+\end{itemize}
+\end{enumerate}
+
+Given these challenges, the dependent label will be the future 3-month change in performance compared to the company's industry benchmark.
+This way, we can control for most of market/macroeconomic variables and focus on determining if sentiment has an impact as well as manage any time delay associated with the impact in company performance associated with sentiment.
 
 
 %\begin{figure}[!t]
