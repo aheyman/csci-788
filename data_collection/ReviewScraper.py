@@ -116,13 +116,10 @@ def safe_dictionary_lookup(review, attrib, clazz, key):
 
 companies = []
 
-with open('results_complete.csv') as csvfile:
+with open('../csvs/results_complete.csv') as csvfile:
     companyreader = csv.reader(csvfile, delimiter=',')
     for row in companyreader:
         companies.append(Company(row[0], row[1], int(row[2])))
-        if len(companies) > 100:
-            break
-
 
 for company in companies:
 
@@ -141,7 +138,7 @@ for company in companies:
             if (len(mongo_reviews) > 149):
                 glassdoor_reviews.insert_many(mongo_reviews)
                 mongo_reviews = []
-            wait = randint(15, 60)
+            wait = randint(5, 45)
             print("waiting " + str(wait) + " seconds")
             time.sleep(wait)
 
